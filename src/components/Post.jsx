@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import useFlash from "../hooks/useFlash.js";
+import { useFlash } from "../contexts/FlashMessageContext";
 // FIREBASE
 import { doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/firebase";
@@ -13,13 +13,14 @@ import {
 } from "@fortawesome/free-regular-svg-icons";
 import { faHeart as heartFilled } from "@fortawesome/free-solid-svg-icons";
 import FlashMsg from "./FlashMsg";
+import { useUser } from "../contexts/UserContext";
 
-export default function Post({ data, currentUser: user }) {
+export default function Post({ data }) {
     const [isLiked, setIsLiked] = useState(false);
     const [docRef, setDocRef] = useState({});
     const [postOwner, setPostOwner] = useState({});
-    const [setFlash, flash] = useFlash();
-
+    const { setFlashMessage } = useFlash();
+    const { user } = useUser();
     useEffect(() => {
         setIsLiked(data.likedBy.includes(user?.uid));
     }, [user]);
@@ -34,10 +35,10 @@ export default function Post({ data, currentUser: user }) {
 
     function likePost() {
         if (!user) {
-            setFlash({
+            setFlashMessage({
                 show: true,
-                success: false,
                 msg: "Please Sign In first!",
+                type: "error",
             });
             return;
         }
@@ -56,12 +57,10 @@ export default function Post({ data, currentUser: user }) {
 
     function deletePost() {
         deleteDoc(docRef).then(() => {
-            setFlash((prevFlash) => ({
-                ...prevFlash,
+            setFlashMessage({
                 show: true,
-                success: true,
                 msg: "Post deleted",
-            }));
+            });
         });
     }
 
@@ -70,7 +69,7 @@ export default function Post({ data, currentUser: user }) {
             className="bg-[#fff] border border-[#ccc] rounded-lg shadow-lg dark:bg-darkText
 		dark:border-darkText"
         >
-            {flash.show && <FlashMsg flash={flash} setFlash={setFlash} />}
+            <FlashMsg />
             <div className="p-4 flex flex-col items-start gap-5">
                 <div className="w-full flex items-center gap-2">
                     <img

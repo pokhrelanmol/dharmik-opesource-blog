@@ -3,11 +3,11 @@ import { doc, setDoc } from "firebase/firestore";
 import React from "react";
 import { useUser } from "../contexts/UserContext";
 import { auth, db, provider } from "../firebase/firebase";
-import useFlash from "../hooks/useFlash";
+import { useFlash } from "../contexts/FlashMessageContext";
 
 const Auth = () => {
     const { user, setUser } = useUser();
-    const [setFlash, flash] = useFlash();
+    const { flashMessage, setFlashMessage } = useFlash();
 
     const signInWithGoogle = async () => {
         const data = await signInWithPopup(auth, provider);
@@ -15,10 +15,10 @@ const Auth = () => {
         const userRef = doc(db, "users", uid);
 
         setDoc(userRef, { uid, photoURL, email, displayName }).then(() => {
-            setFlash({
+            setFlashMessage({
                 show: true,
                 msg: "Signed In Successfully",
-                success: true,
+                type: "success",
             });
         });
         setUser({ uid, photoURL, email, displayName });
@@ -27,10 +27,10 @@ const Auth = () => {
     const signUserOut = () => {
         signOut(auth).then(() => {
             setUser(null);
-            setFlash({
+            setFlashMessage({
                 show: true,
                 msg: "Signed Out Successfully",
-                success: true,
+                type: "success",
             });
         });
     };

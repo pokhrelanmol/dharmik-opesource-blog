@@ -4,7 +4,6 @@ import Post from "./Post";
 import { useEffect, useState } from "react";
 import { onSnapshot, orderBy, query } from "firebase/firestore";
 import { postsColRef } from "../firebase/firebase.js";
-
 const FormattedSkeleton = ({ count }) => {
     const color = "#87888a";
     const noOfSkeleton = new Array(count).fill(1);
@@ -36,7 +35,7 @@ const FormattedSkeleton = ({ count }) => {
     );
 };
 
-export default function Posts({ currentUser, setFlash }) {
+export default function Posts({ setFlash }) {
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
@@ -54,12 +53,7 @@ export default function Posts({ currentUser, setFlash }) {
 
     const renderPosts = () =>
         posts.map((post) => (
-            <Post
-                data={post}
-                currentUser={currentUser}
-                setFlash={setFlash}
-                key={post.id}
-            />
+            <Post data={post} setFlash={setFlash} key={post.id} />
         ));
 
     return (

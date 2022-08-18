@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { useUser } from "../contexts/UserContext";
 import {
     faAdd,
     faImage,
@@ -12,11 +12,12 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import { postsColRef, storage } from "../firebase/firebase";
 import { compressImage } from "../utils/compress-image";
-export default function NewPost({ currentUser }) {
+export default function NewPost() {
     const [titleText, setTitleText] = useState("");
     const [imgFile, setImgFile] = useState(null);
     const [previewImgUrl, setPreviewImgUrl] = useState("");
     const [isPosting, setIsPosting] = useState(false);
+    const { user } = useUser();
     function post(e) {
         e?.preventDefault();
         setIsPosting(true);
@@ -35,7 +36,7 @@ export default function NewPost({ currentUser }) {
                 img: url,
                 createdAt: serverTimestamp(),
                 likedBy: [],
-                uid: currentUser.uid,
+                uid: user.uid,
             }).then(() => {
                 setTitleText("");
                 setImgFile(null);
@@ -61,7 +62,7 @@ export default function NewPost({ currentUser }) {
         <div
             className={`grid bg-primary border border-[#ccc] p-3 rounded-lg shadow-lg 
     dark:bg-darkText dark:border-primary dark:text-primary ${
-        currentUser && "mt-5"
+        user.email && "mt-5"
     }`}
         >
             <form onSubmit={(e) => post(e)}>
